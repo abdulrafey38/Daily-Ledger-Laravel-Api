@@ -18,7 +18,7 @@ class Product extends JsonResource
             'id'=>$this->id,
             'name'=>$this->name,
             'price'=>$this->price,
-            'updated_at'=>$this->updated_at,
+            'updated_at'=>$this->updated_at->diffForHumans(),
             'supplier_id'=>$this->supplier_id,
             'supplier'=>$this->supplier->name
 

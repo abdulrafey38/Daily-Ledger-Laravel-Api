@@ -30,6 +30,8 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::get('monthDT/{id}','TransactionController@monthDT');
     Route::get('dailyTransaction','TransactionController@daily');
     Route::get('getSupplierProducts/{id}','ProductController@getSupplierProducts');
+    Route::get('monthlySpendAmount/{id}','TransactionController@monthlySpendAmount');
+  
 
 //=================================================================
 Route::resource('/product', 'ProductController');

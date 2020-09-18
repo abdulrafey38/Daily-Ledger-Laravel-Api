@@ -8,6 +8,7 @@ use App\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Transaction as TransactionResource;
+use App\Product;
 
 class TransactionController extends Controller
 {
@@ -64,20 +65,34 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+      
+
         $request->validate([
-            'user_id'=>['required'],
+            
             'supplier_id'=>['required'],
             'product_id'=>['required'],
             'month_id'=>['required'],
             'date'=>['required'], 
             'quantity'=>['required'],
-            'price'=>['required'],
-            
         ]);
-        $transaction = Transaction::create($request->all());
-        return response()->json([
-            "transaction"=>$transaction
-        ],201);
+       
+        
+        $productPrice = Product::where('id',$request->product_id)->pluck('price');
+        
+
+
+        $price = $request->quantity * $productPrice[0];
+        $transaction = new Transaction();
+        $transaction->user_id = Auth::user()->id;
+        $transaction->product_id = $request->product_id;
+        $transaction->supplier_id = $request->supplier_id;
+        $transaction->month_id = $request->month_id;
+        $transaction->date = $request->date;
+        $transaction->quantity = $request->quantity;
+        $transaction->price = $price;
+        $transaction->save();
+        return response()->json(201);
+    
     }
 
     /**
@@ -87,7 +102,7 @@ class TransactionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
+    {  
         
         $transaction =Transaction::find($id);
         if(!$transaction)
@@ -171,10 +186,15 @@ class TransactionController extends Controller
     {
  
         $transactionPMD = Transaction::where('month_id',$id)->get();
-        error_log($transactionPMD);
-        error_log('denjdbchje');
         return response()->json(['transaction'=>
             TransactionResource::collection($transactionPMD)]
         ,200);
+    }
+//========================================================================
+    public function monthlySpendAmount($id)
+    {
+
+        return response()->json([
+            'amount'=>Transaction::where('month_id',$id)->sum('price')],200);
     }
 }
