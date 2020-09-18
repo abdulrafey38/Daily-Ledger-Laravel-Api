@@ -107,7 +107,6 @@ class ProductController extends Controller
         $request->validate([
             'name'=>['required'],
             'price'=>['required'],
-            'user_id'=>['required'],
             'supplier_id'=>['required'],
             
         ]);
@@ -151,10 +150,8 @@ class ProductController extends Controller
 //=======================================================================
     public function getSupplierProducts($id)
     {
-        error_log($id);
-        error_log('hjdeghde');
+      
         $products = Product::where('supplier_id',$id)->get();
-        error_log($products);
         return response()->json(['supplierProduct'=> ProductResource::collection($products)],200);
     }
 }

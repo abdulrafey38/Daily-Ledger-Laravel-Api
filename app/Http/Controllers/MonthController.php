@@ -109,7 +109,7 @@ class MonthController extends Controller
             'name'=>['required'],
             'start_date'=>['required'],
             'end_date'=>['required'],
-            'user_id'=>['required'],
+           
             
         ]);
         
@@ -121,11 +121,7 @@ class MonthController extends Controller
             ]);
         }
         else{
-            $month->name = $request->name;
-            $month->start_date=$request->start_date;    
-            $month->end_date =  $request->end_date;
-            $month->user_id =  $request->user_id;
-            $month->save();
+            $month->update($request->all());
             return response()->json([
                 'month'=>$month
             ],200);

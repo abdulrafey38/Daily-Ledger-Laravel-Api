@@ -107,7 +107,6 @@ class SupplierController extends Controller
         $request->validate([
             'name'=>['required'],
             'phone_number'=>['required'],
-            'user_id'=>['required'],
             
         ]);
         
@@ -119,10 +118,7 @@ class SupplierController extends Controller
             ]);
         }
         else{
-            $supplier->name = $request->name;
-            $supplier->phone_number=$request->phone_number;    
-            $supplier->user_id =  $request->user_id;
-            $supplier->save();
+            $supplier->update($request->all());
             return response()->json([
                 'supplier'=>$supplier
             ],200);
