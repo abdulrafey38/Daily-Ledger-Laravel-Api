@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Supplier;
 use Illuminate\Http\Request;
-use App\Http\Resources\userSupplier;
+use App\Http\Resources\Supplier as SupplierResource;
 use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
@@ -18,11 +18,11 @@ class SupplierController extends Controller
     {
         $user= Auth::user();
     
-        $supplier = $user->suppliers;
+        $supplier = $user->suppliers->sortByDesc('created_at');
        
 
         return  \response()->json([
-            'supplier'=>$supplier
+            'supplier'=>SupplierResource::collection($supplier)
         ],200);
     }
 

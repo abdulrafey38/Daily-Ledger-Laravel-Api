@@ -25,7 +25,7 @@ class TransactionController extends Controller
         error_log($user);
 
         return response()->json([
-            'transaction'=>  TransactionResource::collection($user->transactions)
+            'transaction'=>  TransactionResource::collection($user->transactions->sortByDesc('date'))
         ],200);
     }
 
@@ -41,7 +41,7 @@ class TransactionController extends Controller
         $user =  Auth::user();
        
         return response()->json([
-            'transaction'=>  TransactionResource::collection($user->transactions->where('date',$date))
+            'transaction'=>  TransactionResource::collection($user->transactions->where('date',$date)->sortByDesc('date'))
         ],200);
     }
 
@@ -187,7 +187,7 @@ class TransactionController extends Controller
  
         $transactionPMD = Transaction::where('month_id',$id)->get();
         return response()->json(['transaction'=>
-            TransactionResource::collection($transactionPMD)]
+            TransactionResource::collection($transactionPMD->sortByDesc('date'))]
         ,200);
     }
 //========================================================================

@@ -17,7 +17,7 @@ class ProductController extends Controller
     public function index()
     {
 
-        $product = Auth::user()->products;
+        $product = Auth::user()->products->sortByDesc('created_at');
 
 
         return response()->json(['product'=> ProductResource::collection($product)],200);

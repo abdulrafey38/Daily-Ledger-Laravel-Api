@@ -6,6 +6,7 @@ use App\Month;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Month as MonthResource;
 
 class MonthController extends Controller
 {
@@ -19,7 +20,7 @@ class MonthController extends Controller
         $user = Auth::user();
       
         return response()->json([
-            'month'=>$user->months,
+            'month'=>MonthResource::collection($user->months->sortByDesc('date')),
         ],200);
     }
 
