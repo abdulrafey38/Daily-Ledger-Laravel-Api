@@ -16,74 +16,110 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 class AuthController extends Controller
 {
 
-        public function login(Request $request)
-        {
-                
-    
-            $request->validate([
-                'email' => ['required'],
-                'password' => ['required'],
-    
-            ]);
-            $user = User::where('email', $request->email)->first();
-    
-            if(Auth::attempt($request->only('email','password'))){
-                $token = $user->createToken($request->email)->plainTextToken;
-                $response = [
-                    'user' => $user,
-                    'token'=>$token
-                ];
-                return response($response,200);
-            }
-    
-            throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
-                ]);
-    }
-
-//==============================================================================
-    public function update(Request $request)
+    public static function login(Request $request)
     {
+
+
         $request->validate([
-            'name'=>['required'],
             'email' => ['required'],
-            
+            'password' => ['required'],
 
         ]);
+        $user = User::where('email', $request->email)->first();
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $token = $user->createToken($request->email)->plainTextToken;
+            $response = [
+                'user' => $user,
+                'token' => $token
+            ];
+            return response($response, 200);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.'],
+        ]);
+    }
+
+    //==============================================================================
+    public function update(Request $request)
+    {
+        if ($request->password) {
+            $request->validate([
+                'name' => ['required'],
+                'email' => ['required'],
+                'password' => ['min:8']
+            ]);
+        } else {
+            $request->validate([
+                'name' => ['required'],
+                'email' => ['required'],
+
+            ]);
+        }
         $user = Auth::user();
         $password = $user->password;
 
-        if($request->password)
-        {
+        if ($request->password) {
             $user->name = $request->name;
-            $user->email=$request->email;
+            $user->email = $request->email;
             $user->password =  \bcrypt($request->password);
             $user->update();
-
-        }
-        else{
+        } else {
             $user->name = $request->name;
-            $user->email=$request->email;
+            $user->email = $request->email;
             $user->password =  $password;
             $user->update();
         }
-        
-       
-
         return response()->json([
-            'user'=>$user
-        ],200);
+            'user' => $user
+        ], 200);
     }
 
     //================================================
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::user()->tokens()->delete();
-       return response()->json(200);    
+
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(200);
+    }
+    //=======================================================
+    public function token(Request $request)
+    {
+        if ($request->user()->currentAccessToken()) {
+            return response()->json(200);
+        } else {
+            return response()->json(500);
+        }
     }
 
-        
+    //=======================================================
+    public function tokenbahir(Request $request)
+    {
+       return \response()->json(200);
+    }
 
+
+    //========================================================
+    public function register(Request $request)
+    {
+
+
+        $request->validate([
+            'name' => ['required'],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'min:8', 'confirmed']
+        ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'info' => self::login($request)
+        ], 201);
+    }
 }
 
 //     public function authenticate(Request $request)

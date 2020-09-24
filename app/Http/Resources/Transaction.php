@@ -19,12 +19,14 @@ class Transaction extends JsonResource
             'supplier_id'=>$this->supplier->id,
             'product_id'=>$this->product_id,
             'date'=>$this->date,
+            'updated_at'=>$this->updated_at->diffForHumans(),
             'quantity'=>$this->quantity,
             'price'=>$this->price,
             'supplier'=>$this->supplier->name,
             'product'=>$this->product->name,
             'month_id'=>$this->month_id,
-            'month'=>$this->month->name
+            'month'=>$this->month->name,
+         
 
 
         ];

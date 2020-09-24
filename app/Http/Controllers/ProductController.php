@@ -20,7 +20,7 @@ class ProductController extends Controller
         $product = Auth::user()->products->sortByDesc('created_at');
 
 
-        return response()->json(['product'=> ProductResource::collection($product)],200);
+        return response()->json(['product' => ProductResource::collection($product)], 200);
     }
 
 
@@ -43,12 +43,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $request->validate([
-            'name'=>['required'],
-            'price'=>['required'],
-            'supplier_id'=>['required'],
-            
+            'name' => ['required'],
+            'price' => ['required'],
+            'supplier_id' => ['required'],
+
         ]);
 
         $product =  new Product();
@@ -59,8 +59,8 @@ class ProductController extends Controller
         $product->save();
         error_log($product);
         return response()->json([
-            "product"=>$product
-        ],201);
+            "product" => $product
+        ], 201);
     }
 
     /**
@@ -71,17 +71,16 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product =Product::find($id);
-        if(!$product)
-        {
+        $product = Product::find($id);
+        if (!$product) {
             return response()->json([
-                'Message'=>'Item Not Found'
-            ],400);
+                'Message' => 'Item Not Found'
+            ], 400);
         }
         return response()->json([
-            'success'=>true,
-            'product'=>$product
-        ],200);
+            'success' => true,
+            'product' => $product
+        ], 200);
     }
 
     /**
@@ -105,20 +104,18 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'=>['required'],
-            'price'=>['required'],
-            'supplier_id'=>['required'],
-            
+            'name' => ['required'],
+            'price' => ['required'],
+            'supplier_id' => ['required'],
+
         ]);
-        
+
         $product = Product::find($id);
-        if(is_null($product))
-        {
+        if (is_null($product)) {
             return response()->json([
-                'Not Found',400
+                'Not Found', 400
             ]);
-        }
-        else{
+        } else {
             // $product->name = $request->name;
             // $product->price=$request->price;    
             // $product->user_id =  $request->user_id;
@@ -126,8 +123,8 @@ class ProductController extends Controller
             // $product->save();
             $product->update($request->all());
             return response()->json([
-                'product'=>$product
-            ],200);
+                'product' => $product
+            ], 200);
         }
     }
 
@@ -140,18 +137,18 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product =  Product::find($id);
-        if(is_null($product))
-        {
-            return response()->json('Item Not Found',404);
+        if (is_null($product)) {
+            return response()->json('Item Not Found', 404);
+        } else {
+            $product->delete();
+            return response()->json("Deleted Successfully!!", 200);
         }
-        $product->delete();
-        return response()->json("Deleted Successfully!!",200);
     }
-//=======================================================================
+    //=======================================================================
     public function getSupplierProducts($id)
     {
-      
-        $products = Product::where('supplier_id',$id)->get();
-        return response()->json(['supplierProduct'=> ProductResource::collection($products)],200);
+
+        $products = Product::where('supplier_id', $id)->get();
+        return response()->json(['supplierProduct' => ProductResource::collection($products)], 200);
     }
 }

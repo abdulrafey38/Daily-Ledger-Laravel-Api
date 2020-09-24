@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateSuppliersTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Run the migrations.php artisan serve --host 10.28.87.11 --port 8080
      *
      * @return void
      */

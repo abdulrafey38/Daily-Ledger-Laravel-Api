@@ -18,10 +18,10 @@ class MonthController extends Controller
     public function index()
     {
         $user = Auth::user();
-      
+
         return response()->json([
-            'month'=>MonthResource::collection($user->months->sortByDesc('date')),
-        ],200);
+            'month' => MonthResource::collection($user->months->sortByDesc('date')),
+        ], 200);
     }
 
     /**
@@ -42,14 +42,23 @@ class MonthController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $request->validate([
-            'name'=>['required'],
-            'start_date'=>['required','after:yesterday'],
-            'end_date'=>['required','after:start_date'],
-            
+            'name' => ['required'],
+            'start_date' => ['required', 'after:yesterday'],
+            'end_date' => ['required', 'after:start_date'],
+
         ]);
-       
+        $date = Carbon::createFromFormat('Y-m-d', $request->start_date);
+
+        $daysToAdd = 31;
+        $date = $date->addDays($daysToAdd)->format('Y-m-d');
+
+        $request->validate([
+
+            'end_date' => ['required', 'after:$date'],
+
+        ]);
 
         $month = new Month();
         $month->name = $request->name;
@@ -59,8 +68,8 @@ class MonthController extends Controller
         $month->save();
         error_log($month);
         return response()->json([
-            "month"=>$month
-        ],201);
+            "month" => $month
+        ], 201);
     }
 
     /**
@@ -71,18 +80,17 @@ class MonthController extends Controller
      */
     public function show($id)
     {
-        
-        $month =Month::find($id);
-        if(!$month)
-        {
+
+        $month = Month::find($id);
+        if (!$month) {
             return response()->json([
-                'Message'=>'Item Not Found'
-            ],400);
+                'Message' => 'Item Not Found'
+            ], 400);
         }
         return response()->json([
-            'success'=>true,
-            'month'=>$month
-        ],200);
+            'success' => true,
+            'month' => $month
+        ], 200);
     }
 
     /**
@@ -105,27 +113,24 @@ class MonthController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $request->validate([
-            'name'=>['required'],
-            'start_date'=>['required'],
-            'end_date'=>['required'],
-           
-            
+            'name' => ['required'],
+            'start_date' => ['required', 'after:yesterday'],
+            'end_date' => ['required', 'after:start_date'],
+
         ]);
-        
+
         $month = Month::find($id);
-        if(is_null($month))
-        {
+        if (is_null($month)) {
             return response()->json([
-                'Not Found',400
+                'Not Found', 400
             ]);
-        }
-        else{
+        } else {
             $month->update($request->all());
             return response()->json([
-                'month'=>$month
-            ],200);
+                'month' => $month
+            ], 200);
         }
     }
 
@@ -137,18 +142,17 @@ class MonthController extends Controller
      */
     public function destroy($id)
     {
-        
+
         $month =  Month::find($id);
-        if(is_null($month))
-        {
-            return response()->json('Item Not Found',404);
+        if (is_null($month)) {
+            return response()->json('Item Not Found', 404);
         }
         $month->delete();
-        return response()->json("Deleted Successfully!!",200);
+        return response()->json("Deleted Successfully!!", 200);
     }
 
-//============================================================================
+    //============================================================================
 
-   
-    
+
+
 }

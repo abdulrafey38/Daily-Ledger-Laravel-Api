@@ -12,9 +12,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
 
-class User extends Authenticatable 
+class User extends Authenticatable
 {
-    use Notifiable,HasApiTokens;
+    use Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -57,7 +57,7 @@ class User extends Authenticatable
     // {
     //     return [];
     // }
-//===================================================================================
+    //===================================================================================
 
     //relations
     public function suppliers()

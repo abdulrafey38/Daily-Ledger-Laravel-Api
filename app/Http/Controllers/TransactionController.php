@@ -18,31 +18,31 @@ class TransactionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    
+
     {
-        
+
         $user =  Auth::user();
         error_log($user);
 
         return response()->json([
-            'transaction'=>  TransactionResource::collection($user->transactions->sortByDesc('date'))
-        ],200);
+            'transaction' =>  TransactionResource::collection($user->transactions->sortByDesc('date'))
+        ], 200);
     }
 
 
     public function daily()
-    
+
     {
         $t = Carbon::now();
 
-        $date = $t->year.'-'.today()->format('m').'-'.$t->day;
+        $date = $t->year . '-' . today()->format('m') . '-' . $t->day;
         error_log($date);
-        
+
         $user =  Auth::user();
-       
+
         return response()->json([
-            'transaction'=>  TransactionResource::collection($user->transactions->where('date',$date)->sortByDesc('date'))
-        ],200);
+            'transaction' =>  TransactionResource::collection($user->transactions->where('date', $date)->sortByDesc('date'))
+        ], 200);
     }
 
 
@@ -65,20 +65,20 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-      
+
 
         $request->validate([
-            
-            'supplier_id'=>['required'],
-            'product_id'=>['required'],
-            'month_id'=>['required'],
-            'date'=>['required'], 
-            'quantity'=>['required'],
+
+            'supplier_id' => ['required'],
+            'product_id' => ['required'],
+            'month_id' => ['required'],
+            'date' => ['required'],
+            'quantity' => ['required'],
         ]);
-       
-        
-        $productPrice = Product::where('id',$request->product_id)->pluck('price');
-        
+
+
+        $productPrice = Product::where('id', $request->product_id)->pluck('price');
+
 
 
         $price = $request->quantity * $productPrice[0];
@@ -92,7 +92,6 @@ class TransactionController extends Controller
         $transaction->price = $price;
         $transaction->save();
         return response()->json(201);
-    
     }
 
     /**
@@ -102,19 +101,18 @@ class TransactionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {  
-        
-        $transaction =Transaction::find($id);
-        if(!$transaction)
-        {
+    {
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
             return response()->json([
-                'Message'=>'Item Not Found'
-            ],400);
+                'Message' => 'Item Not Found'
+            ], 400);
         }
         return response()->json([
-            'success'=>true,
-            'transaction'=>$transaction
-        ],200);
+            'success' => true,
+            'transaction' => $transaction
+        ], 200);
     }
 
     /**
@@ -137,30 +135,40 @@ class TransactionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $request->validate([
-            'user_id'=>['required'],
-            'supplier_id'=>['required'],
-            'product_id'=>['required'],
-            'month_id'=>['required'],
-            'date'=>['required'], 
-            'quantity'=>['required'],
-            'price'=>['required'],
-            
+
+            'supplier_id' => ['required'],
+            'product_id' => ['required'],
+            'month_id' => ['required'],
+            'date' => ['required'],
+            'quantity' => ['required'],
+
         ]);
+
+        $productPrice = Product::where('id', $request->product_id)->pluck('price');
+
+        $price = $request->quantity * $productPrice[0];
+
         $transaction = Transaction::find($id);
-        if(is_null($transaction))
-        {
+        if (is_null($transaction)) {
             return response()->json([
-                'Not Found',400
+                'Not Found', 400
             ]);
-        }
-        else{
-            
-            $transaction->update($request->all());
+        } else {
+
+            // $transaction->update($request->all());
+            $transaction->user_id = Auth::user()->id;
+            $transaction->product_id = $request->product_id;
+            $transaction->supplier_id = $request->supplier_id;
+            $transaction->month_id = $request->month_id;
+            $transaction->date = $request->date;
+            $transaction->quantity = $request->quantity;
+            $transaction->price = $price;
+            $transaction->save();
             return response()->json([
-                'transaction'=>$transaction
-            ],200);
+                'transaction' => $transaction
+            ], 200);
         }
     }
 
@@ -172,29 +180,31 @@ class TransactionController extends Controller
      */
     public function destroy($id)
     {
-        
+
         $transaction =  Transaction::find($id);
-        if(is_null($transaction))
-        {
-            return response()->json('Item Not Found',404);
+        if (is_null($transaction)) {
+            return response()->json('Item Not Found', 404);
         }
         $transaction->delete();
-        return response()->json("Deleted Successfully!!",200);
+        return response()->json("Deleted Successfully!!", 200);
     }
-//=======================================================================
+    //=======================================================================
     public function monthDT($id)
     {
- 
-        $transactionPMD = Transaction::where('month_id',$id)->get();
-        return response()->json(['transaction'=>
-            TransactionResource::collection($transactionPMD->sortByDesc('date'))]
-        ,200);
+
+        $transactionPMD = Transaction::where('month_id', $id)->get();
+        return response()->json(
+            ['transaction' =>
+            TransactionResource::collection($transactionPMD->sortByDesc('date'))],
+            200
+        );
     }
-//========================================================================
+    //========================================================================
     public function monthlySpendAmount($id)
     {
 
         return response()->json([
-            'amount'=>Transaction::where('month_id',$id)->sum('price')],200);
+            'amount' => Transaction::where('month_id', $id)->sum('price')
+        ], 200);
     }
 }

@@ -16,14 +16,14 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $user= Auth::user();
-    
+        $user = Auth::user();
+
         $supplier = $user->suppliers->sortByDesc('created_at');
-       
+
 
         return  \response()->json([
-            'supplier'=>SupplierResource::collection($supplier)
-        ],200);
+            'supplier' => SupplierResource::collection($supplier)
+        ], 200);
     }
 
     /**
@@ -46,19 +46,19 @@ class SupplierController extends Controller
     {
         error_log($request);
         $request->validate([
-            'name'=>['required'],
-            'phone_number'=>['required'],    
-            
+            'name' => ['required'],
+            'phone_number' => ['required'],
+
         ]);
         $supplier = new Supplier();
         $supplier->name = $request->name;
         $supplier->phone_number = $request->phone_number;
-        $supplier->user_id=Auth::user()->id;
+        $supplier->user_id = Auth::user()->id;
         $supplier->save();
 
         return response()->json([
-            "supplier"=>$supplier
-        ],201);
+            "supplier" => $supplier
+        ], 201);
     }
 
     /**
@@ -69,18 +69,17 @@ class SupplierController extends Controller
      */
     public function show($id)
     {
-        
+
         $supplier = Supplier::find($id);
-        if(!$supplier)
-        {
+        if (!$supplier) {
             return response()->json([
-                'Message'=>'Item Not Found'
-            ],400);
+                'Message' => 'Item Not Found'
+            ], 400);
         }
         return response()->json([
-            'success'=>true,
-            'supplier'=>$supplier
-        ],200);
+            'success' => true,
+            'supplier' => $supplier
+        ], 200);
     }
 
     /**
@@ -103,25 +102,23 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $request->validate([
-            'name'=>['required'],
-            'phone_number'=>['required'],
-            
+            'name' => ['required'],
+            'phone_number' => ['required'],
+
         ]);
-        
+
         $supplier =  Supplier::find($id);
-        if(is_null($supplier))
-        {
+        if (is_null($supplier)) {
             return response()->json([
-                'Not Found',400
+                'Not Found', 400
             ]);
-        }
-        else{
+        } else {
             $supplier->update($request->all());
             return response()->json([
-                'supplier'=>$supplier
-            ],200);
+                'supplier' => $supplier
+            ], 200);
         }
     }
 
@@ -133,13 +130,12 @@ class SupplierController extends Controller
      */
     public function destroy($id)
     {
-        
+
         $supplier =  Supplier::find($id);
-        if(is_null($supplier))
-        {
-            return response()->json('Item Not Found',404);
+        if (is_null($supplier)) {
+            return response()->json('Item Not Found', 404);
         }
         $supplier->delete();
-        return response()->json(["Deleted Successfully!!"],200);
+        return response()->json(["Deleted Successfully!!"], 200);
     }
 }
